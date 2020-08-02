@@ -1,17 +1,15 @@
 # os_from_scratch
 Fresh start of os_dev using https://github.com/cfenollosa/os-tutorial
 
-## 01-bootsector-barebones
+## 02-bootsector-barebones
 
-### Goal: Create a file with the BIOS interprets as a bootable disk
+### Goal: Make silent boot sector print text
 
-Bootloader recoginses a drive as bootable by bytes 511 and 512 being 0xAA55 (pay attention to endianess, it comes out as `55 aa`).
+Write 'Hello' int to the `al` register `0x0e` into  `ah` and raise `0x10` interrupt (general video services)
 
+`0x0e` on `ah` tells the video interrupt that we want to write the contents of `al` in tty mode
 
 
 ### Notes
-To view the disassembly of the compiled binary use either
-`ndisam -b32 <binary>`
-or
-`objdump -D -b binary -mi386 -M intel <binary>`
 
+According to the guide, `xdd <filename>` also prints the disassembly
