@@ -1,15 +1,18 @@
 # os_from_scratch
 Fresh start of os_dev using https://github.com/cfenollosa/os-tutorial
 
-## 02-bootsector-barebones
+## 03-bootsector-memory
 
-### Goal: Make silent boot sector print text
+### Goal: Learn how the computer memory is organised
 
-Write 'Hello' int to the `al` register `0x0e` into  `ah` and raise `0x10` interrupt (general video services)
+Read page 14 [of this document](https://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf)<sup>1</sup> and look at the memory layout
 
-`0x0e` on `ah` tells the video interrupt that we want to write the contents of `al` in tty mode
+boot_sect_memory.asm provide a few example of the incorrect methods to use memory (although some do work).
+boot_sect_memory_org.asm displays the correct way using a global offset definition defined by `[org 0x7c00]`.
+The correct method is *attempt 2* in *boot_sect_memory_org.bin*.
 
+
+[1] The tutorial is heavily inspired by this document
 
 ### Notes
 
-According to the guide, `xdd <filename>` also prints the disassembly
