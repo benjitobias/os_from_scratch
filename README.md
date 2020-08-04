@@ -1,11 +1,11 @@
 # os_from_scratch
 Fresh start of os_dev using https://github.com/cfenollosa/os-tutorial
 
-## 04-bootsector-stack
+## 05-bootsector-function-strings
 
-### Goal: Learn how to use the stack
+### Goal: Basic coding with the assembler
 
-Remember: `bp` register stores the base address, `sp` stores the top and the stacl grows downwards from bp (`sp` decreases).
+Basic assemmbly
 
 ### Notes
 
