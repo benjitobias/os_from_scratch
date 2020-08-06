@@ -3,7 +3,7 @@ Fresh start of os_dev using https://github.com/cfenollosa/os-tutorial
 
 ## 06-bootsector-segmentation
 
-### Goal: Leran how to address 16-bit real mode segmentation
+### Goal: Learn how to address 16-bit real mode segmentation
 We did segmentation with [org] on lesson 3. Segmentation means that you can specify an offset to all the data you refer to.
 
 Special registers `cs`, `ds`, `ss` and `es` for Code, Data, Stack and Extra (i.e user-defined)
