@@ -1,7 +1,7 @@
 # os_from_scratch
 Fresh start of os_dev using https://github.com/cfenollosa/os-tutorial
 
-## 08-32bit-gdt
+## 09-32bit-gdt
 
 ### GOAL: Program the GDT
 
