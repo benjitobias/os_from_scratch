@@ -1,17 +1,19 @@
 # os_from_scratch
 Fresh start of os_dev using https://github.com/cfenollosa/os-tutorial
 
-## 06-bootsector-segmentation
+## 07-bootsector-disk
 
-### Goal: Leran how to address 16-bit real mode segmentation
-We did segmentation with [org] on lesson 3. Segmentation means that you can specify an offset to all the data you refer to.
+### Goal: Let the bootsector load data from the disk in order to boot the kernel
 
-Special registers `cs`, `ds`, `ss` and `es` for Code, Data, Stack and Extra (i.e user-defined)
+Our OS won't fit inside the bootsector 512 bytes so we need to read data from the disk.
+We can use BIOS routines, like when printing, to read.
+Set `al` to `0x02` (and other registers with the required cylinder, head and sector) and raise int `0x13`
 
-Beware: they are _implicitly_ used by the CPU, so once you set some value for, say, ds, then all your memory access will be offset by ds. [Read more here](https://wiki.osdev.org/Segmentation)
+[man int13h](https://stanislavs.org/helppc/int_13-2.html)
 
-Furthermore, to compute the real address we don't just join the two addresses, but we _overlap_ them: `segment << 4 + address`. For example, if `ds` is `0x4d`, then `[0x20]` actually refers to `0x4d0 + 0x20 = 0x4f0`
+The BIOS sets `al` to th numbers of sectors read.
 
-We cannot `mov` literals to those registers, a general purpose register must be used
+We'll use the carry bit here. `jc` (jump if carry)
+
 ### Notes
 
