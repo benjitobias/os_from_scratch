@@ -1,20 +1,26 @@
 # os_from_scratch
 Fresh start of os_dev using https://github.com/cfenollosa/os-tutorial
 
-## 08-32bit-gdt
+## 08-32bit-print
 
-### GOAL: Program the GDT
+### GOAL: Print on the screen when in 32-bit protected mode
 
-Remember segmentation from lesson 6? The offset was left shifted to address an extra level of indirection.
+32-bit mode allows us to use 32 bit registers and memory addressing, protected memory, virtual memory and other advantages but we will lose BIOS interrupts and we'll need to code the GDT (more on this later).
 
-In 32-bit mode, segmentation works differently. Now, the offset becomes an index to a segment descriptor (SD) in the GDT. This descriptor defines the base address (32 bits), the size (20 bits) and some flags, like readonly, permissions, etc. To add confusion, the data structures are split, so open the [os-dev.pdf file](https://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf) and check out the figure on page 34 or the Wikipedia page for the GDT.
+In this lesson we will write a new print string routine which works in 32-bit mode, where we don't have BIOS interrupts, by directly manipulating the VGA video memory instead of calling int 0x10. The VGA memory starts at address 0xb8000 and it has a text mode which is useful to avoid manipulating direct pixels.
 
-The easiest way to program the GDT is to define two segments, one for code and another for data. These can overlap which means there is no memory protection, but it's good enough to boot, we'll fix this later with a higher language.
+The formula for accessing a specific character on the 80x25 grid is:
 
-As a curiosity, the first GDT entry must be `0x00` to make sure that the programmer didn't make any mistakes managing addresses.
+`0xb8000 + 2 * (row * 80 + col)`
 
-Furthermore, the CPU can't directly load the GDT address, but it requires a meta structure called the "GDT descriptor" with the size (16b) and address (32b) of our actual GDT. It is loaded with the `lgdt` operation.
+That is, every character uses 2 bytes (one for the ASCII, another for color and such), and we see that the structure of the memory concatenates rows.
+
+For now it will always print on the top left of the screen but soon we'll change that with higher level routines.
+
+Unfortunately, we cannot call this brom the bootloader yet as we still don't know how to write the GDT and enter protected mode.
 
 ### Notes
-[GDT](https://wiki.osdev.org/GDT)
-[GDT Tutorial](https://wiki.osdev.org/GDT_Tutorial)
+
+[Printing to screen](https://wiki.osdev.org/Printing_To_Screen)
+[VGA Hardware](https://wiki.osdev.org/VGA_Hardware)
+[Protected Mode](https://wiki.osdev.org/Protected_Mode)
