@@ -43,7 +43,7 @@ curl -O https://ftp.gnu.org/gnu/binutils/binutils-2.35.tar.gz # If the link 404'
 tar xf binutils-2.35.tar.gz
 mkdir binutils-build
 cd binutils-build
-../binutils-2.35/configure --target=$TARGET --enable-interwork --enable-multilib --disable-nls --disable-werror --prefix=$PREFIX 2>&1 | tee configure.log
+../binutils-2.35/configure --target=$TARGET --enable-interwork --enable-multilib --disable-nls --disable-werror --prefix=$PREFIX --with-sysroot 2>&1 | tee configure.log
 make all install 2>&1 | tee make.log
 `
 
