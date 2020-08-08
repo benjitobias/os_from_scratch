@@ -1,74 +1,59 @@
 # os_from_scratch
 Fresh start of os_dev using https://github.com/cfenollosa/os-tutorial
 
-## 11-kernel-crosscompiler
+## 13-kernel-barebones
 
-### GOAL: Create a development enviornment to build your kernel
+### GOAL: Create a simple kernel and a bootsector capable of booting it
+#####The kernel
 
-For now this step can probably be skipped but a cross-compiler will be needed in the future when jumping to higher level languages.
+Our C kernel will just print an 'X' on the top left corner of the screen: `kernel.c`
 
-[Why do I need a cross-compiler](https://wiki.osdev.org/Why_do_I_need_a_Cross_Compiler)
+There is a dummy function that does nothing/ That function will force us to create a kernel entry routine which does not point to byte 0x0 in our kernel but to an actual label which we know launches it.
+In our case, function `main()`.
 
-Instructions are adapted from the [OSDev wiki](https://wiki.osdev.org/GCC_Cross-Compiler)
+`i386-elf-gcc -ffreestanding -c kernel.c -o kernel.o`
 
-#### Required packages
+That routine is coded on `kernel_entry.asm`. Inside there is an `[extern]` declaration.
+To compile this file, instead of generating a binary, we will generate an `elf` format file which will be linked with `kernel.o`
 
-Install required packages
- * gmp
- * mpfr
- * libmpc
- * gcc
+`nasm kernel_entry.asm -f elf -o kernel_entry.o`
 
-We need `gcc` to build a cross-compiled `gcc`.
+#####The linker
+A linker is a very powerful tool and we only started to benefit from it.
 
-Once installed, find where `gcc` is (`which `gcc`) and export it:
-```
-export CC=/usr/bin/cc
-export LD=/usr/bin/cc
-```
+To link both object files into a single binary kernel and resolve label references, run:
+`i386-elf-ld -o kernel.bin -Ttext 0x1000 kernel_entry.o kernel.o --oformat binary`
 
-We will need to build binutils and a cross-compiled gcc which we will put in `/usr/local/i386elfgcc`, so let's export some paths now.
-Feel free to change
-```
-export PREFIX="/usr/local/i386elfgcc"
-export TRAGET=i386-elf
-export PATH="$PREFIX/bin:$PATH"
-```
+Notice how our kernel will be places not a `0x0` in memory but at `0x1000`. The bootsector will need to know this address too.
 
-##### binutils
-```
-mkdir /tmp/src
-cd /tmp/src
-curl -O https://ftp.gnu.org/gnu/binutils/binutils-2.35.tar.gz # If the link 404's, look for a more recent version
-tar xf binutils-2.35.tar.gz
-mkdir binutils-build
-cd binutils-build
-../binutils-2.35/configure --target=$TARGET --enable-interwork --enable-multilib --disable-nls --disable-werror --prefix=$PREFIX --with-sysroot 2>&1 | tee configure.log
-make all install 2>&1 | tee make.log
-```
+#####The bootsector
+It is very similar to the one in lesson 10. Without the print message lines, it comes around at only a couple dozen lines.
 
-##### gcc
-```
-cd /tmp/src
-curl -O https://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.gz
-tar xf gcc-10.2.0.tar.gz
-mkdir gcc-build
-cd gcc-build
-../gcc-10.2.0/configure --target=$TARGET --prefix="$PREFIX" --disable-nls --disable-libssp --enable-languages=c --without-headers
-make all-gcc 
-make all-target-libgcc 
-make install-gcc 
-make install-target-libgcc
-```
+Compile with `nasm bootsect.asm -f bin -o bootsect.bin`
 
-That's it! You should have all the GNU binutils and the compiler at /usr/local/i386elfgcc/bin, prefixed by i386-elf- to avoid collisions with your system's compiler and binutils.
+#####Putting it all together
+Now we have 2 separate files for the bootsector and the kernel.
 
-You may want to add the $PATH to your .bashrc. From now on, on this tutorial, we will explicitly use the prefixes when using the cross-compiled gcc.
+Link them into a single file by just concatenating them!
+
+`cat bootsect.bin kernel.bin > os-image.bin`
+
+#####Run!
+
+You can now run `os-image.bin` with qemu
+
+Remember that if you find disk load errors you may need to play with the disk numbers or qemu parameters (floppy = `0x0`, hdd = `0x80`). I usually use `qemu-system-i386 -fda os-image.bin`
+
+You will see four messages:
+
+* "Started in 16-bit Real Mode"
+* "Loading kernel into memory"
+* (Top left) "Landed in 32-bit Protected Mode"
+* (Top left, overwriting previous message) "X"
+* Congratulations!
+
+#####Makefile
+Tidy up the compilation process with a Makefile
 
 ### Notes
 
-I got stuck trying to compile all-target-libgcc
-
-`configure: error: cannot compute suffix of object files: cannot compile`
-
-I tried loads of things, the one thing that seemed to work was compiling binutils with the `--with-sysroot` flag mentioned [here](https://wiki.osdev.org/GCC_Cross-Compiler#Installing_Dependencies) 
