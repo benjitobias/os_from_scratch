@@ -1,5 +1,5 @@
 #!/bin/bash
-CWD = $(pwd)
+CWD=$(pwd)
 cd /tmp/src
 curl -O http://ftp.rediris.es/mirror/GNU/gdb/gdb-9.2.tar.xz
 tar xf gdb-9.2.tar.xz
