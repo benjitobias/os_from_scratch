@@ -67,3 +67,8 @@ You may want to add the $PATH to your .bashrc. From now on, on this tutorial, we
 
 ### Notes
 
+I got stuck trying to compile all-target-libgcc
+
+`configure: error: cannot compute suffix of object files: cannot compile`
+
+I tried loads of things, the one thing that seemed to work was compiling binutils with the `--with-sysroot` flag mentioned [here](https://wiki.osdev.org/GCC_Cross-Compiler#Installing_Dependencies) 
