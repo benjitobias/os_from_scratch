@@ -1,59 +1,40 @@
 # os_from_scratch
 Fresh start of os_dev using https://github.com/cfenollosa/os-tutorial
 
-## 13-kernel-barebones
+## 14-checkpoint
 
-### GOAL: Create a simple kernel and a bootsector capable of booting it
-#####The kernel
+### GOAL: Organise our code a little bit and then learn how to debug the kernel with gdb
 
-Our C kernel will just print an 'X' on the top left corner of the screen: `kernel.c`
+At this point we techincally have a kernel running even if it only prints 'X'. Now it is time to stop for a moment and organise the code into folders, create a scalable Makefile for future code and think strategy.
 
-There is a dummy function that does nothing/ That function will force us to create a kernel entry routine which does not point to byte 0x0 in our kernel but to an actual label which we know launches it.
-In our case, function `main()`.
+Since most code from here will be C, we'll take advantage of qemu's ability to open a connection to gdb. First let's installed a cross-compiled gdb.
 
-`i386-elf-gcc -ffreestanding -c kernel.c -o kernel.o`
+```
+cd /tmp/src
+curl -O http://ftp.rediris.es/mirror/GNU/gdb/gdb-9.2.tar.xz
+tar xf gdb-9.2.tar.xz
+mkdir gdb-build
+cd gdb-build
+export PREFIX="/usr/local/i386elfgcc"
+export TARGET=i386-elf
+../gdb-9.2/configure --target="$TARGET" --prefix="$PREFIX" --program-prefix=i386-elf-
+make
+make install
+```
 
-That routine is coded on `kernel_entry.asm`. Inside there is an `[extern]` declaration.
-To compile this file, instead of generating a binary, we will generate an `elf` format file which will be linked with `kernel.o`
+`make debug` in the Makefile builds `kernel.elf` which is an object file (not a binary) with all the symbols we generated on the kernel, thanks to the `-g` flag on gcc. Examine it with `xxd` to see some strings or even better with `strings kernel.elf`
 
-`nasm kernel_entry.asm -f elf -o kernel_entry.o`
+We can take advantage of this cool qemu feature. Type `make debug` and, on the gdb shell:
 
-#####The linker
-A linker is a very powerful tool and we only started to benefit from it.
+* Set up a breakpoint in `kernel.c:main()`: `b main`
+* Run the OS: `continue`
+* Run two steps into the code: `next` then `next`. You will see that we are just about to set the 'X' on the screen, but it isn't there yet (check out the qemu screen)
+* Let's see what's in the video memory: `print *video_memory`. There is the 'L' from "Landed in 32-bit Protected Mode"
+* Hmmm, let's make sure that `video_memory` points to the correct address: print `video_memory`
+* `next` to put there our 'X'
+* Let's make sure: print `*video_memory` and look at the qemu screen. It's definitely there.
 
-To link both object files into a single binary kernel and resolve label references, run:
-`i386-elf-ld -o kernel.bin -Ttext 0x1000 kernel_entry.o kernel.o --oformat binary`
-
-Notice how our kernel will be places not a `0x0` in memory but at `0x1000`. The bootsector will need to know this address too.
-
-#####The bootsector
-It is very similar to the one in lesson 10. Without the print message lines, it comes around at only a couple dozen lines.
-
-Compile with `nasm bootsect.asm -f bin -o bootsect.bin`
-
-#####Putting it all together
-Now we have 2 separate files for the bootsector and the kernel.
-
-Link them into a single file by just concatenating them!
-
-`cat bootsect.bin kernel.bin > os-image.bin`
-
-#####Run!
-
-You can now run `os-image.bin` with qemu
-
-Remember that if you find disk load errors you may need to play with the disk numbers or qemu parameters (floppy = `0x0`, hdd = `0x80`). I usually use `qemu-system-i386 -fda os-image.bin`
-
-You will see four messages:
-
-* "Started in 16-bit Real Mode"
-* "Loading kernel into memory"
-* (Top left) "Landed in 32-bit Protected Mode"
-* (Top left, overwriting previous message) "X"
-* Congratulations!
-
-#####Makefile
-Tidy up the compilation process with a Makefile
+You may notice that, since this is a tutorial, we haven't yet discussed which kind of kernel we will write. It will probably be a monolithic one since they are easier to design and implement, and after all this is our first OS. Maybe in the future we'll add a lesson "15-b" with a microkernel design. Who knows.
 
 ### Notes
 
