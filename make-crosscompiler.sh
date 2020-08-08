@@ -39,6 +39,6 @@ read -p "[?] Update ~/.bash PATH? [y]/n " -r
 if [[ ! $REPLY =~ ^[Yy]$ ]]
 then
     echo "[#] Updating PATH in ~/.bash"
-    echo "export PATH=$PATH" >> ~/.bash
+    echo "export PATH=$PATH" >> ~/.bashrc
 fi
 cd $CWD
