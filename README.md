@@ -48,7 +48,7 @@ make all install 2>&1 | tee make.log
 ```
 
 ##### gcc
-`
+```
 cd /tmp/src
 curl -O https://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.gz
 tar xf gcc-10.2.0.tar.gz
