@@ -20,7 +20,7 @@ KERNEL_OFFSET equ 0x1000 ; The same one used when linking the kernel
 %include "32bit-print.asm"
 %include "32bit-switch.asm"
 
-[bits16]
+[bits 16]
 load_kernel:
     mov bx, MSG_LOAD_KERNEL
     call print
@@ -32,7 +32,7 @@ load_kernel:
     call disk_load
     ret
 
-[bits32]
+[bits 32]
 BEGIN_PM:
     mov ebx, MSG_PROT_MODE
     call print_string_pm
