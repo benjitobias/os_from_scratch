@@ -1,5 +1,5 @@
 void caller() {
-    my_func(0xdede)
+    my_func(0xdede);
 }
 
 int my_func(int arg) {
