@@ -15,7 +15,7 @@ KERNEL_OFFSET equ 0x1000 ; The same one used when linking the kernel
 
 %include "boot_sect_print.asm"
 %include "boot_sect_print_hex.asm"
-%include "boot_sect_dict.asm"
+%include "boot_sect_disk.asm"
 %include "32bit-gdt.asm"
 %include "32bit-print.asm"
 %include "32bit-switch.asm"
