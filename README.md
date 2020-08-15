@@ -37,4 +37,6 @@ We can take advantage of this cool qemu feature. Type `make debug` and, on the g
 You may notice that, since this is a tutorial, we haven't yet discussed which kind of kernel we will write. It will probably be a monolithic one since they are easier to design and implement, and after all this is our first OS. Maybe in the future we'll add a lesson "15-b" with a microkernel design. Who knows.
 
 ### Notes
-
+I couldn't actually get the gdb that we'd compiled to work properly. I was getting a known error.
+Eventually I just installed gdb-multiarm and used that.
+On top of that, I ran `qemu-system-i386 -s -S -fda os-image.bin` and then `target remote localhost:1234; symbol-file kernel.elf` in gdb to attach
